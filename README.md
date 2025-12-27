@@ -1,5 +1,10 @@
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
+## 🚀 Live Demo
+**Your Tool is Live Here:** [https://talabat-task-tool-ryev.vercel.app](https://talabat-task-tool-ryev.vercel.app)
+
+**Database Dashboard:** [https://supabase.com/dashboard/project/_](https://supabase.com/dashboard/project/_)
+
 ## Getting Started
 
 First, run the development server:
