@@ -1,0 +1,136 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String         @id @default(cuid())
+  email            String         @unique
+  name             String
+  role             String         @default("MEMBER")
+  avatar           String?
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  activityLogs     ActivityLog[]
+  comments         Comment[]
+  notifications    Notification[]
+  createdProjects  Project[]      @relation("ProjectCreator")
+  assignedTasks    Task[]         @relation("AssignedTasks")
+  createdTasks     Task[]         @relation("CreatedTasks")
+  assignedProjects Project[]      @relation("ProjectAssignees")
+  requests         Request[]      @relation("UserRequests")
+}
+
+model Task {
+  id           String        @id @default(cuid())
+  title        String
+  description  String?
+  priority       String        @default("MEDIUM")
+  status         String        @default("NEW")
+  classification String        @default("OTHER") // MONTHLY, OTHER
+  revisionCount  Int           @default(0)
+  dueDate      DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  creatorId    String
+  assigneeId   String?
+  projectId    String?
+  activityLogs ActivityLog[]
+  comments     Comment[]
+  managerNotes ManagerNote[]
+  project      Project?      @relation(fields: [projectId], references: [id])
+  assignee     User?         @relation("AssignedTasks", fields: [assigneeId], references: [id])
+  creator      User          @relation("CreatedTasks", fields: [creatorId], references: [id])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String
+  entityType String
+  entityId   String
+  details    String?
+  field      String?
+  oldValue   String?
+  newValue   String?
+  createdAt  DateTime @default(now())
+  taskId     String?
+  projectId  String?
+  project    Project? @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  task       Task?    @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([userId])
+  @@index([taskId])
+  @@index([projectId])
+  @@index([createdAt])
+}
+
+model ManagerNote {
+  id        String   @id @default(cuid())
+  taskId    String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  @@index([taskId])
+}
+
+model Comment {
+  id        String   @id @default(cuid())
+  content   String
+  taskId    String
+  authorId  String
+  createdAt DateTime @default(now())
+  author    User     @relation(fields: [authorId], references: [id])
+  task      Task     @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id        String   @id @default(cuid())
+  type      String
+  message   String
+  read      Boolean  @default(false)
+  userId    String
+  taskId    String?
+  createdAt DateTime @default(now())
+  projectId String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Project {
+  id           String        @id @default(cuid())
+  title        String
+  description  String?
+  status       String        @default("ACTIVE")
+  priority     String        @default("MEDIUM")
+  startDate    DateTime?
+  dueDate      DateTime?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+  creatorId    String
+  activityLogs ActivityLog[]
+  creator      User          @relation("ProjectCreator", fields: [creatorId], references: [id])
+  tasks        Task[]
+  assignees    User[]        @relation("ProjectAssignees")
+}
+
+model Request {
+  id             String    @id @default(cuid())
+  title          String
+  description    String?
+  isUrgent       Boolean   @default(false)
+  dueDate        DateTime?
+  status         String    @default("PENDING") // PENDING, APPROVED, REJECTED
+  managerComment String?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  requesterId    String
+  requester      User      @relation("UserRequests", fields: [requesterId], references: [id])
+}

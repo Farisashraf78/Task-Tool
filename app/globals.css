@@ -1,26 +1,39 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-talabat-orange: #FF5900;
+  --talabat-orange: 25 100% 50%;
+  --talabat-brown: 356 55% 16%;
+  --talabat-offwhite: 36 44% 94%;
+  --talabat-purple: 274 77% 47%;
+  --talabat-green: 73 100% 62%;
+  --background: 0 0% 100%;
+
+  --font-sans: var(--font-inter);
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@layer base {
+  body {
+    background-color: var(--color-talabat-offwhite);
+    color: var(--color-talabat-brown);
+    antialiased: true;
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* Custom Utilities if needed, or mapped from earlier */
+@utility text-talabat-brown {
+  color: var(--color-talabat-brown);
 }
+
+@utility bg-talabat-offwhite {
+  background-color: var(--color-talabat-offwhite);
+}
+
+@utility bg-talabat-orange {
+  background-color: var(--color-talabat-orange);
+}
+
+/* ... mappings for other utilties if v4 doesnt auto-generate from theme keys? 
+ * Tailwind v4 DOES auto-generate utils from theme keys. 
+ * So `bg-talabat-orange` should work automatically if defined in @theme.
+ */
