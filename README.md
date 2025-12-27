@@ -29,8 +29,27 @@ To learn more about Next.js, take a look at the following resources:
 
 You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+## 🚀 Deployment Guide (Get your Shareable Link)
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### ONE-CLICK DEPLOY (Recommended)
+This button will create the project on Vercel and set up the database for you.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2FFarisashraf78%2FTask-Tool&env=DATABASE_URL&project-name=talabat-task-tool&repository-name=talabat-task-tool)
+
+### Steps to Deploy:
+1. **Click the "Deploy" button** above.
+2. Sign in with GitHub if asked.
+3. In the Vercel project setup page:
+   - **Click "Install"** for Vercel interactions if prompted.
+   - Look for the **Storage** or **Database** section (might happen after the first step or you can add it manually in the dashboard).
+   - Select **Vercel Postgres** (it's free).
+   - Click **Connect** or **Create**.
+4. Vercel will automatically add the `DATABASE_URL` environment variable for you.
+5. Click **Deploy**.
+
+Once deployment is complete, Vercel will give you a link like `https://talabat-task-tool.vercel.app`. **Share this link with your team.**
+
+### Note on Database
+The project is configured to simpler setup:
+- It uses **Vercel Postgres** (Cloud Database).
+- The `build` command is set to automatically update the database schema so you don't need to run manual commands.
