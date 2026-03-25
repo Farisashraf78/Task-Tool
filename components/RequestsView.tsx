@@ -93,7 +93,7 @@ export function RequestsView({ requests, currentUser }: RequestsViewProps) {
                 {!isManager && (
                     <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                         <DialogTrigger asChild>
-                            <Button className="bg-talabat-orange hover:bg-orange-600 gap-2">
+                            <Button className="bg-talabat-orange hover:bg-[#E04D00] text-white font-bold rounded-lg shadow-[0_4px_14px_rgba(255,89,0,0.3)] transition-all gap-2">
                                 <Plus className="h-4 w-4" />
                                 New Request
                             </Button>
@@ -133,16 +133,16 @@ export function RequestsView({ requests, currentUser }: RequestsViewProps) {
             </div>
 
             <div className="flex items-center gap-2">
-                <div className="flex items-center bg-gray-100 p-1 rounded-lg">
+                <div className="flex items-center bg-talabat-light-gray p-1 rounded-lg border border-talabat-border">
                     {["ALL", "PENDING", "APPROVED", "REJECTED"].map((tab) => (
                         <button
                             key={tab}
                             onClick={() => setFilter(tab)}
                             className={cn(
-                                "px-4 py-1.5 text-xs font-bold rounded-md transition-all",
+                                "px-4 py-1.5 text-[11px] uppercase font-bold rounded-md transition-all",
                                 filter === tab
-                                    ? "bg-white text-talabat-orange shadow-sm"
-                                    : "text-gray-500 hover:text-gray-700"
+                                    ? "bg-white text-talabat-orange shadow-[0_1px_3px_rgba(0,0,0,0.1)]"
+                                    : "text-talabat-text-muted hover:text-talabat-text-dark"
                             )}
                         >
                             {tab}
@@ -153,10 +153,16 @@ export function RequestsView({ requests, currentUser }: RequestsViewProps) {
 
             {/* Request List */}
             <div className="grid gap-4">
-                {filteredRequests.map(req => (
-                    <div key={req.id} className="bg-white border border-gray-100 rounded-xl p-6 shadow-sm flex flex-col md:flex-row gap-6 items-start md:items-center relative overflow-hidden">
+                {filteredRequests.map(req => {
+                    let borderClass = "border-l-talabat-text-muted";
+                    if (req.status === "APPROVED") borderClass = "border-l-[#22C55E]";
+                    else if (req.status === "REJECTED") borderClass = "border-l-red-500";
+                    else if (req.status === "PENDING") borderClass = "border-l-talabat-orange";
+
+                    return (
+                    <div key={req.id} className={`bg-white rounded-xl p-6 shadow-[0_2px_8px_rgba(0,0,0,0.06)] flex flex-col md:flex-row gap-6 items-start md:items-center relative overflow-hidden border-l-[4px] ${borderClass}`}>
                         {/* Urgent Stripe */}
-                        {req.isUrgent && <div className="absolute left-0 top-0 bottom-0 w-1 bg-red-500" />}
+                        {req.isUrgent && <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-red-500" />}
 
                         <div className="flex-1 space-y-2">
                             <div className="flex items-center gap-3 mb-1">
@@ -168,20 +174,21 @@ export function RequestsView({ requests, currentUser }: RequestsViewProps) {
                                         <AlertTriangle className="h-3 w-3" /> Urgent
                                     </Badge>
                                 )}
-                                <span className="text-xs text-gray-500">
+                                <span className="text-xs text-talabat-text-muted font-medium">
                                     {format(new Date(req.createdAt), "MMM d, yyyy")}
                                 </span>
                             </div>
-                            <h3 className="text-lg font-bold text-gray-900">{req.title}</h3>
-                            {req.description && <p className="text-gray-600 text-sm">{req.description}</p>}
+                            <h3 className="text-lg font-bold text-talabat-text-dark">{req.title}</h3>
+                            {req.description && <p className="text-talabat-text-muted text-sm">{req.description}</p>}
 
-                            <div className="flex items-center gap-2 text-xs text-gray-400 mt-2">
-                                <span>Requested by <span className="font-medium text-gray-700">{req.requester.name}</span></span>
+                            <div className="flex items-center gap-2 text-xs text-talabat-text-muted mt-2">
+                                <span>Requested by <span className="font-bold text-talabat-text-dark">{req.requester.name}</span></span>
                             </div>
                             {req.managerComment && (
-                                <div className="mt-4 p-3 bg-gray-50 border border-gray-100 rounded-lg">
-                                    <p className="text-[10px] text-gray-500 uppercase font-bold mb-1">Maha&apos;s Update</p>
-                                    <p className="text-sm text-gray-700 italic">&quot;{req.managerComment}&quot;</p>
+                                <div className="mt-4 p-4 bg-talabat-purple/5 border border-talabat-purple/10 rounded-lg relative">
+                                    <div className="absolute top-0 left-0 w-1 h-full bg-talabat-purple rounded-l-lg" />
+                                    <p className="text-[10px] text-talabat-purple uppercase font-bold mb-1">Manager&apos;s Response</p>
+                                    <p className="text-sm text-talabat-text-dark italic">&quot;{req.managerComment}&quot;</p>
                                 </div>
                             )}
                         </div>
@@ -196,10 +203,10 @@ export function RequestsView({ requests, currentUser }: RequestsViewProps) {
                                     onChange={(e) => setActionComment(prev => ({ ...prev, [req.id]: e.target.value }))}
                                 />
                                 <div className="flex items-center gap-3">
-                                    <Button size="sm" variant="ghost" className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50" onClick={() => handleAction(req.id, "REJECTED")}>
+                                    <Button size="sm" variant="ghost" className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 font-bold" onClick={() => handleAction(req.id, "REJECTED")}>
                                         Reject
                                     </Button>
-                                    <Button size="sm" className="flex-2 bg-green-600 hover:bg-green-700 text-white" onClick={() => handleAction(req.id, "APPROVED")}>
+                                    <Button size="sm" className="flex-2 bg-[#22C55E] hover:bg-green-600 text-white font-bold" onClick={() => handleAction(req.id, "APPROVED")}>
                                         <CheckCircle2 className="h-4 w-4 mr-2" />
                                         Approve & Create task
                                     </Button>
@@ -208,7 +215,7 @@ export function RequestsView({ requests, currentUser }: RequestsViewProps) {
                         )}
                         {!isManager && req.status === "PENDING" && (
                             <div className="flex items-center gap-4">
-                                <div className="text-sm text-gray-400 italic">Waiting for approval...</div>
+                                <div className="text-sm text-talabat-text-muted italic">Waiting for approval...</div>
                                 <Button
                                     variant="ghost"
                                     size="sm"
@@ -220,7 +227,7 @@ export function RequestsView({ requests, currentUser }: RequestsViewProps) {
                             </div>
                         )}
                     </div>
-                ))}
+                );})}
 
                 {filteredRequests.length === 0 && (
                     <div className="text-center py-12 text-gray-400">

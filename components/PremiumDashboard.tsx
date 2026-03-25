@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { NewTaskDialog } from "./NewTaskDialog";
 import { TaskDetailsDialog } from "./TaskDetailsDialog";
@@ -11,7 +12,7 @@ import { TaskBoard } from "./TaskBoard";
 import { BentoTaskCard } from "./BentoTaskCard";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { Search, X, LayoutGrid, Columns3, Filter, Download } from "lucide-react";
+import { Search, X, LayoutGrid, Columns3, Filter, Download, Calendar } from "lucide-react";
 import { motion } from "framer-motion";
 import { isOverdue } from "@/lib/taskUtils";
 
@@ -150,9 +151,45 @@ export function PremiumDashboard({ tasks, users, currentUser }: BentoDashboardPr
                     {isManager ? (
                         <TeamPulse teamMembers={teamCapacity} />
                     ) : (
-                        // Placeholder for Member view (could be recent activity or personal stats)
-                        <div className="h-full min-h-[200px] rounded-xl border border-dashed border-gray-200 flex items-center justify-center text-gray-400 text-sm">
-                            Your Focus Area
+                        <div className="bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.06)] h-full flex flex-col pt-5">
+                            <div className="px-5 pb-3 border-b border-talabat-border">
+                                <h3 className="text-base font-semibold text-talabat-text-dark">
+                                    My Tasks Summary
+                                </h3>
+                            </div>
+                            <div className="flex-1 p-2 space-y-2 overflow-y-auto">
+                                {tasks
+                                    .filter(t => t.assigneeId === currentUser.id && t.status !== "COMPLETED")
+                                    .sort((a, b) => {
+                                        if (!a.dueDate) return 1;
+                                        if (!b.dueDate) return -1;
+                                        return new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime()
+                                    })
+                                    .slice(0, 8)
+                                    .map(task => {
+                                        return (
+                                            <div key={task.id} className="flex flex-col gap-1.5 p-3 hover:bg-talabat-light-gray rounded-lg cursor-pointer transition-colors" onClick={() => setSelectedTask(task)}>
+                                                <div className="flex items-start justify-between gap-3">
+                                                    <span className="text-sm font-bold text-talabat-text-dark line-clamp-1">
+                                                        {task.title}
+                                                    </span>
+                                                    <span className="text-[10px] whitespace-nowrap font-bold px-2 py-0.5 rounded-full bg-talabat-light-gray text-talabat-text-dark">
+                                                        {task.status.replace("_", " ")}
+                                                    </span>
+                                                </div>
+                                                <div className="flex items-center gap-1.5 text-[11px] text-talabat-text-muted font-bold uppercase mt-1">
+                                                    <Calendar className="w-3 h-3" />
+                                                    {task.dueDate ? format(new Date(task.dueDate), "MMM d, yyyy") : "No date"}
+                                                </div>
+                                            </div>
+                                        );
+                                })}
+                                {tasks.filter(t => t.assigneeId === currentUser.id && t.status !== "COMPLETED").length === 0 && (
+                                    <div className="text-center py-8 text-sm text-talabat-text-muted">
+                                        No active tasks
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     )}
                 </div>

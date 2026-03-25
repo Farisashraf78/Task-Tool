@@ -2,38 +2,24 @@
 
 @theme {
   --color-talabat-orange: #FF5900;
-  --talabat-orange: 25 100% 50%;
-  --talabat-brown: 356 55% 16%;
-  --talabat-offwhite: 36 44% 94%;
-  --talabat-purple: 274 77% 47%;
-  --talabat-green: 73 100% 62%;
+  --color-talabat-lime: #CFFF00;
+  --color-talabat-maroon: #411517;
+  --color-talabat-cream: #F4EDE3;
+  --color-talabat-purple: #8318D8;
+  --color-talabat-white: #FFFFFF;
+  --color-talabat-light-gray: #F5F5F5;
+  --color-talabat-text-dark: #1A1A1A;
+  --color-talabat-text-muted: #6B6B6B;
+  --color-talabat-border: #E5E5E5;
+  
   --background: 0 0% 100%;
-
   --font-sans: var(--font-inter);
 }
 
 @layer base {
   body {
-    background-color: var(--color-talabat-offwhite);
-    color: var(--color-talabat-brown);
+    background-color: var(--color-talabat-cream);
+    color: var(--color-talabat-text-dark);
     antialiased: true;
   }
 }
-
-/* Custom Utilities if needed, or mapped from earlier */
-@utility text-talabat-brown {
-  color: var(--color-talabat-brown);
-}
-
-@utility bg-talabat-offwhite {
-  background-color: var(--color-talabat-offwhite);
-}
-
-@utility bg-talabat-orange {
-  background-color: var(--color-talabat-orange);
-}
-
-/* ... mappings for other utilties if v4 doesnt auto-generate from theme keys? 
- * Tailwind v4 DOES auto-generate utils from theme keys. 
- * So `bg-talabat-orange` should work automatically if defined in @theme.
- */

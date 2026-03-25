@@ -27,28 +27,29 @@ export function UpcomingDeadlines({ tasks, onTaskClick }: UpcomingDeadlinesProps
     };
 
     return (
-        <Card className="border border-gray-200 shadow-sm bg-white h-full">
-            <CardHeader className="pb-3 border-b border-gray-50">
-                <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2 text-lg font-semibold text-gray-800">
-                        <Calendar className="h-5 w-5 text-talabat-orange" />
-                        Upcoming Deadlines
-                    </CardTitle>
-                    <span className="text-xs text-gray-500 font-medium bg-gray-50 px-2 py-1 rounded-full">
-                        Next 7 Days
-                    </span>
-                </div>
-            </CardHeader>
-            <CardContent className="p-0">
+        <div className="bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.06)] h-full flex flex-col pt-5">
+            <div className="px-5 flex items-center justify-between pb-3 border-b border-talabat-border">
+                <h3 className="text-base font-semibold text-talabat-text-dark">
+                    Upcoming Deadlines
+                </h3>
+            </div>
+            <div className="flex-1 mt-2">
                 {tasks.length === 0 ? (
-                    <div className="flex flex-col items-center justify-center py-12 text-gray-400">
-                        <Calendar className="h-10 w-10 mb-2 opacity-20" />
-                        <p className="text-sm">No upcoming deadlines this week</p>
+                    <div className="flex items-center gap-2 px-5 py-3 text-talabat-text-muted bg-talabat-light-gray/50 rounded-lg mx-5 mb-5">
+                        <Calendar className="h-4 w-4" />
+                        <p className="text-sm">No deadlines in the next 7 days</p>
                     </div>
                 ) : (
-                    <div className="divide-y divide-gray-50">
+                    <div className="divide-y divide-talabat-border">
                         {tasks.slice(0, 5).map((task, index) => {
-                            const urgent = isUrgent(new Date(task.dueDate));
+                            const dueDate = new Date(task.dueDate);
+                            const now = new Date();
+                            const isOverdue = dueDate < now;
+                            const isToday = dueDate.toDateString() === now.toDateString();
+
+                            let dateColor = "text-talabat-text-muted";
+                            if (isOverdue) dateColor = "text-talabat-orange";
+                            else if (isToday) dateColor = "text-[#F59E0B]"; // amber
 
                             return (
                                 <motion.div
@@ -57,42 +58,32 @@ export function UpcomingDeadlines({ tasks, onTaskClick }: UpcomingDeadlinesProps
                                     animate={{ opacity: 1 }}
                                     transition={{ delay: index * 0.05 }}
                                     onClick={() => onTaskClick(task)}
-                                    className="group flex items-center justify-between p-4 hover:bg-gray-50 cursor-pointer transition-colors"
+                                    className="group flex items-center justify-between px-5 py-3 hover:bg-talabat-light-gray cursor-pointer transition-colors"
                                 >
                                     <div className="min-w-0 flex-1 pr-4">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <span className="block font-medium text-gray-800 truncate group-hover:text-talabat-orange transition-colors duration-200">
-                                                {task.title}
-                                            </span>
-                                            {task.priority === "URGENT" && (
-                                                <Badge variant="destructive" className="h-5 px-1.5 text-[10px]">URGENT</Badge>
-                                            )}
-                                        </div>
-                                        <div className="flex items-center gap-3 text-xs text-gray-500">
-                                            <span className="flex items-center gap-1">
-                                                <Clock className="h-3 w-3" />
-                                                {format(new Date(task.dueDate), "MMM d")}
-                                            </span>
-                                            <span className="w-1 h-1 rounded-full bg-gray-300" />
-                                            <span>{task.assignee?.name}</span>
-                                        </div>
+                                        <span className="block font-bold text-talabat-text-dark truncate group-hover:text-talabat-orange transition-colors duration-200">
+                                            {task.title}
+                                        </span>
                                     </div>
 
-                                    <div className={`
-                                        flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border
-                                        ${urgent
-                                            ? "bg-red-50 text-red-700 border-red-100"
-                                            : "bg-gray-50 text-gray-600 border-gray-100"}
-                                    `}>
-                                        {urgent && <AlertCircle className="h-3 w-3" />}
-                                        {getTimeRemaining(new Date(task.dueDate))}
+                                    <div className="flex flex-col items-end shrink-0 gap-1.5">
+                                        <div className="flex items-center gap-2">
+                                            <div className="h-5 w-5 rounded-full bg-talabat-light-gray flex items-center justify-center text-[10px] font-bold text-talabat-text-dark">
+                                                {task.assignee?.name?.charAt(0) || "?"}
+                                            </div>
+                                            <span className="text-xs text-talabat-text-muted">{task.assignee?.name || "Unassigned"}</span>
+                                        </div>
+                                        <div className={`text-[11px] font-bold uppercase flex items-center gap-1 ${dateColor}`}>
+                                            <Clock className="w-3 h-3" />
+                                            {format(dueDate, "MMM d")}
+                                        </div>
                                     </div>
                                 </motion.div>
                             );
                         })}
                     </div>
                 )}
-            </CardContent>
-        </Card>
+            </div>
+        </div>
     );
 }

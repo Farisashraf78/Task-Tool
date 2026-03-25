@@ -17,29 +17,29 @@ export function GlassmorphicMetrics({ total, inProgress, underReview, completed 
             label: "Total Tasks",
             value: total,
             icon: ListTodo,
-            color: "text-gray-600",
-            bg: "bg-gray-100",
+            borderColor: "border-l-talabat-orange",
+            iconColor: "text-talabat-orange"
         },
         {
             label: "In Progress",
             value: inProgress,
             icon: Clock,
-            color: "text-blue-600",
-            bg: "bg-blue-50",
+            borderColor: "border-l-talabat-purple",
+            iconColor: "text-talabat-purple"
         },
         {
             label: "Needs Review",
             value: underReview,
             icon: AlertCircle,
-            color: "text-amber-600",
-            bg: "bg-amber-50",
+            borderColor: "border-l-talabat-lime",
+            iconColor: "text-talabat-text-dark" // "with dark text" for Needs Review
         },
         {
             label: "Completed",
             value: completed,
             icon: CheckCircle2,
-            color: "text-emerald-600",
-            bg: "bg-emerald-50",
+            borderColor: "border-l-[#22C55E]",
+            iconColor: "text-[#22C55E]"
         },
     ];
 
@@ -52,19 +52,17 @@ export function GlassmorphicMetrics({ total, inProgress, underReview, completed 
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: index * 0.05 }}
                 >
-                    <Card className="border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-200 bg-white">
-                        <div className="p-5 flex items-center justify-between">
-                            <div>
-                                <p className="text-sm font-medium text-gray-500 mb-1">{metric.label}</p>
-                                <span className="text-2xl font-bold text-gray-900 tracking-tight">
-                                    {metric.value}
-                                </span>
-                            </div>
-                            <div className={`p-3 rounded-lg ${metric.bg}`}>
-                                <metric.icon className={`h-5 w-5 ${metric.color}`} />
-                            </div>
+                    <div className={`bg-white rounded-xl shadow-[0_2px_8px_rgba(0,0,0,0.06)] border border-talabat-border border-l-[4px] ${metric.borderColor} p-5 relative flex flex-col justify-between`}>
+                        <div className="flex justify-between items-start mb-2">
+                            <p className="text-[11px] font-bold uppercase tracking-wider text-talabat-text-muted">
+                                {metric.label}
+                            </p>
+                            <metric.icon className={`h-4 w-4 ${metric.iconColor}`} />
                         </div>
-                    </Card>
+                        <span className="text-[32px] font-bold text-talabat-text-dark tracking-tight leading-none mt-1">
+                            {metric.value}
+                        </span>
+                    </div>
                 </motion.div>
             ))}
         </div>

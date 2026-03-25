@@ -109,12 +109,12 @@ export function DualDashboard({ users, tasks, projects, currentUser }: DualDashb
         <div className="space-y-6">
             {/* Header & Controls */}
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                <div className="flex items-center gap-2 bg-gray-100 p-1 rounded-lg">
+                <div className="flex items-center bg-talabat-light-gray p-1 rounded-lg border border-talabat-border">
                     <button
                         onClick={() => setActiveTab("TASKS")}
                         className={cn(
-                            "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all",
-                            activeTab === "TASKS" ? "bg-white text-talabat-orange shadow-sm" : "text-gray-500 hover:text-gray-900"
+                            "flex items-center gap-2 px-4 py-1.5 text-[11px] uppercase font-bold rounded-md transition-all",
+                            activeTab === "TASKS" ? "bg-white text-talabat-orange shadow-[0_1px_3px_rgba(0,0,0,0.1)]" : "text-talabat-text-muted hover:text-talabat-text-dark"
                         )}
                     >
                         <LayoutDashboard className="h-4 w-4" />
@@ -123,8 +123,8 @@ export function DualDashboard({ users, tasks, projects, currentUser }: DualDashb
                     <button
                         onClick={() => setActiveTab("PROJECTS")}
                         className={cn(
-                            "flex items-center gap-2 px-4 py-2 rounded-md text-sm font-medium transition-all",
-                            activeTab === "PROJECTS" ? "bg-white text-talabat-orange shadow-sm" : "text-gray-500 hover:text-gray-900"
+                            "flex items-center gap-2 px-4 py-1.5 text-[11px] uppercase font-bold rounded-md transition-all",
+                            activeTab === "PROJECTS" ? "bg-white text-talabat-orange shadow-[0_1px_3px_rgba(0,0,0,0.1)]" : "text-talabat-text-muted hover:text-talabat-text-dark"
                         )}
                     >
                         <Building2 className="h-4 w-4" />
@@ -158,49 +158,51 @@ export function DualDashboard({ users, tasks, projects, currentUser }: DualDashb
                                     Team Performance ({viewMode === "MONTHLY" ? "This Month" : "All Time"})
                                 </h3>
                                 <div className="overflow-x-auto">
-                                    <table className="w-full text-sm">
+                                    <table className="w-full text-sm border-collapse rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.05)] mt-4">
                                         <thead>
-                                            <tr className="border-b border-gray-100 text-left text-gray-500">
-                                                <th className="py-3 font-medium">Member</th>
-                                                <th className="py-3 font-medium">Tasks Assigned</th>
-                                                <th className="py-3 font-medium">Completion Rate</th>
-                                                <th className="py-3 font-medium">On-Time %</th>
-                                                <th className="py-3 font-medium">Late Deliveries</th>
+                                            <tr className="bg-talabat-brown text-white text-left text-xs uppercase tracking-wider">
+                                                <th className="py-3 px-4 font-bold">Member</th>
+                                                <th className="py-3 px-4 font-bold">Tasks Assigned</th>
+                                                <th className="py-3 px-4 font-bold">Completion Rate</th>
+                                                <th className="py-3 px-4 font-bold">On-Time %</th>
+                                                <th className="py-3 px-4 font-bold">Late Deliveries</th>
                                             </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-gray-50">
-                                            {users.filter(u => u.role !== 'MANAGER').map(user => {
+                                        <tbody className="bg-white">
+                                            {users.filter(u => u.role !== 'MANAGER').map((user, idx) => {
                                                 // Get tasks for this user
                                                 const userTasks = filteredTasks.filter(t => t.assigneeId === user.id);
                                                 const metrics = calculateTaskMetrics(userTasks);
+                                                
+                                                const isAlternate = idx % 2 === 1;
 
                                                 return (
-                                                    <tr key={user.id} className="group hover:bg-gray-50 transition-colors">
-                                                        <td className="py-3 flex items-center gap-3">
-                                                            <div className="h-8 w-8 rounded-full bg-orange-100 text-orange-700 flex items-center justify-center font-bold text-xs">
+                                                    <tr key={user.id} className={`group transition-colors ${isAlternate ? "bg-talabat-cream/30" : "bg-white"} hover:bg-talabat-lime/20 cursor-default`}>
+                                                        <td className="py-3 px-4 flex items-center gap-3">
+                                                            <div className="h-8 w-8 rounded-full bg-talabat-orange text-white flex items-center justify-center font-bold text-[10px]">
                                                                 {user.name.charAt(0)}
                                                             </div>
-                                                            <span className="font-semibold text-gray-900">{user.name}</span>
+                                                            <span className="font-bold text-talabat-text-dark">{user.name}</span>
                                                         </td>
-                                                        <td className="py-3 text-gray-600 font-medium">{metrics.total}</td>
-                                                        <td className="py-3">
+                                                        <td className="py-3 px-4 text-talabat-text-muted font-medium">{metrics.total}</td>
+                                                        <td className="py-3 px-4">
                                                             <div className="flex items-center gap-2">
-                                                                <div className="w-16 h-2 bg-gray-100 rounded-full overflow-hidden">
-                                                                    <div className="h-full bg-green-500" style={{ width: `${metrics.rate}%` }} />
+                                                                <div className="w-16 h-2 bg-talabat-light-gray rounded-full overflow-hidden">
+                                                                    <div className="h-full bg-[#22C55E]" style={{ width: `${metrics.rate}%` }} />
                                                                 </div>
-                                                                <span className="text-xs font-medium">{metrics.rate}%</span>
+                                                                <span className="text-[11px] font-bold text-talabat-text-dark">{metrics.rate}%</span>
                                                             </div>
                                                         </td>
-                                                        <td className="py-3">
+                                                        <td className="py-3 px-4">
                                                             <span className={cn(
-                                                                "px-2 py-0.5 rounded text-xs font-bold",
+                                                                "px-2 py-0.5 rounded-full text-[10px] font-bold",
                                                                 metrics.onTimeRate >= 80 ? "bg-green-100 text-green-700" :
                                                                     metrics.onTimeRate >= 50 ? "bg-yellow-100 text-yellow-700" : "bg-red-100 text-red-700"
                                                             )}>
                                                                 {metrics.onTimeRate}%
                                                             </span>
                                                         </td>
-                                                        <td className="py-3 font-medium text-red-600">
+                                                        <td className="py-3 px-4 font-bold text-red-600 text-xs">
                                                             {metrics.late > 0 ? `${metrics.late} Tasks` : "-"}
                                                         </td>
                                                     </tr>
@@ -247,33 +249,36 @@ export function DualDashboard({ users, tasks, projects, currentUser }: DualDashb
                                     <TrendingUp className="h-5 w-5 text-blue-500" />
                                     Project Output ({viewMode === "MONTHLY" ? "This Month" : "All Time"})
                                 </h3>
-                                <table className="w-full text-sm">
+                                <table className="w-full text-sm border-collapse rounded-xl overflow-hidden shadow-[0_1px_3px_rgba(0,0,0,0.05)] mt-4">
                                     <thead>
-                                        <tr className="border-b border-gray-100 text-left text-gray-500">
-                                            <th className="py-3 font-medium">Member</th>
-                                            <th className="py-3 font-medium">Projects Assigned</th>
-                                            <th className="py-3 font-medium">Completed Projects</th>
-                                            <th className="py-3 font-medium">Completion Rate</th>
+                                        <tr className="bg-talabat-brown text-white text-left text-xs uppercase tracking-wider">
+                                            <th className="py-3 px-4 font-bold">Member</th>
+                                            <th className="py-3 px-4 font-bold">Projects Assigned</th>
+                                            <th className="py-3 px-4 font-bold">Completed Projects</th>
+                                            <th className="py-3 px-4 font-bold">Completion Rate</th>
                                         </tr>
                                     </thead>
-                                    <tbody className="divide-y divide-gray-50">
-                                        {users.filter(u => u.role !== 'MANAGER').map(user => {
+                                    <tbody className="bg-white">
+                                        {users.filter(u => u.role !== 'MANAGER').map((user, idx) => {
                                             const userProjects = filteredProjects.filter(p => p.assignees.some((a) => a.id === user.id));
                                             const metrics = calculateProjectMetrics(userProjects);
+                                            
+                                            const isAlternate = idx % 2 === 1;
+
                                             return (
-                                                <tr key={user.id} className="group hover:bg-gray-50 transition-colors">
-                                                    <td className="py-3 flex items-center gap-3">
-                                                        <div className="h-8 w-8 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xs">
+                                                <tr key={user.id} className={`group transition-colors ${isAlternate ? "bg-talabat-cream/30" : "bg-white"} hover:bg-talabat-lime/20 cursor-default`}>
+                                                    <td className="py-3 px-4 flex items-center gap-3">
+                                                        <div className="h-8 w-8 rounded-full bg-talabat-orange text-white flex items-center justify-center font-bold text-[10px]">
                                                             {user.name.charAt(0)}
                                                         </div>
-                                                        <span className="font-semibold text-gray-900">{user.name}</span>
+                                                        <span className="font-bold text-talabat-text-dark">{user.name}</span>
                                                     </td>
-                                                    <td className="py-3 font-medium">{metrics.total}</td>
-                                                    <td className="py-3 font-medium text-green-600">{metrics.completed}</td>
-                                                    <td className="py-3">
+                                                    <td className="py-3 px-4 font-bold text-talabat-text-muted">{metrics.total}</td>
+                                                    <td className="py-3 px-4 font-bold text-[#22C55E]">{metrics.completed}</td>
+                                                    <td className="py-3 px-4">
                                                         <div className="flex items-center gap-2">
-                                                            <span className="font-medium">{metrics.rate}%</span>
-                                                            <span className="text-[10px] text-gray-400">({metrics.onTimeRate}% On-Time)</span>
+                                                            <span className="font-bold text-talabat-text-dark">{metrics.rate}%</span>
+                                                            <span className="text-[10px] text-talabat-text-muted">({metrics.onTimeRate}% On-Time)</span>
                                                         </div>
                                                     </td>
                                                 </tr>

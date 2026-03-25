@@ -250,8 +250,8 @@ export function HistoryView({ logs, currentUser, teamMembers, stats }: HistoryVi
                 <HistoryInsights stats={stats} />
             )}
 
-            {/* Clean List View - NO VERTICAL LINES */}
-            <div className="space-y-3">
+            {/* Timeline List View */}
+            <div className="relative pl-6 space-y-6 before:absolute before:inset-y-0 before:left-[11px] before:w-0.5 before:bg-talabat-border">
                 {groupedLogs.length === 0 ? (
                     <div className="py-16 text-center">
                         <div className="w-12 h-12 bg-gray-50 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -267,97 +267,124 @@ export function HistoryView({ logs, currentUser, teamMembers, stats }: HistoryVi
                         const { text, impact } = getParsedDetails(mainLog.details);
                         const isExpanded = expandedGroups.has(group.id);
 
+                        let dotColor = "border-talabat-orange";
+                        let dotBg = "bg-white";
+                        if (mainLog.action.includes("CREATE")) {
+                            dotColor = "border-talabat-purple";
+                        } else if (mainLog.action.includes("COMPLETE") || mainLog.action.includes("APPROVE")) {
+                            dotColor = "border-[#22C55E]";
+                            dotBg = "bg-[#22C55E]";
+                        } else if (mainLog.action.includes("DELETE") || mainLog.action.includes("REJECT")) {
+                            dotColor = "border-red-500";
+                            dotBg = "bg-red-500";
+                        }
+
+                        // Human readable text generator
+                        const getHumanReadableLog = (logItem: any, logText: string) => {
+                            const actionLower = logItem.action.toLowerCase();
+                            const entityClean = logItem.entityType.toLowerCase();
+                            const idShort = logItem.entityId.slice(0, 5) + "...";
+
+                            let statement = "";
+                            if (actionLower.includes("create")) statement = `created a new ${entityClean}`;
+                            else if (actionLower.includes("update") || actionLower.includes("move")) statement = `updated ${entityClean}`;
+                            else if (actionLower.includes("complete")) statement = `completed ${entityClean}`;
+                            else if (actionLower.includes("delete")) statement = `deleted ${entityClean}`;
+                            else statement = `performed ${actionLower} on ${entityClean}`;
+
+                            return (
+                                <span>
+                                    <span className="font-bold text-talabat-text-dark">{logItem.user.name}</span> {statement}{' '}
+                                    <span className="font-bold text-talabat-orange">#{idShort}</span>
+                                    {logText && <span className="text-talabat-text-muted"> - {logText}</span>}
+                                </span>
+                            );
+                        };
+
                         return (
                             <div
                                 key={group.id}
-                                className="bg-white border border-gray-100 rounded-xl hover:border-gray-200 hover:shadow-sm transition-all duration-200 overflow-hidden"
+                                className="relative"
                             >
+                                {/* Timeline Dot */}
+                                <div className={`absolute -left-[29px] top-4 w-3.5 h-3.5 rounded-full border-[3px] ${dotColor} ${dotBg} z-10 shadow-sm`} />
+
                                 <div
                                     onClick={isGroup ? (e) => toggleGroup(group.id, e) : () => setSelectedLog(mainLog)}
-                                    className="px-4 py-3 flex items-center gap-4 cursor-pointer"
+                                    className="bg-white border text-sm border-talabat-border hover:border-talabat-orange/30 rounded-xl hover:shadow-[0_2px_8px_rgba(0,0,0,0.06)] transition-all duration-200 overflow-hidden cursor-pointer"
                                 >
-                                    {/* 1. Avatar */}
-                                    <div className="h-8 w-8 rounded-full bg-gray-50 border border-gray-100 flex items-center justify-center text-xs font-semibold text-gray-700">
-                                        {group.user.name.charAt(0)}
-                                    </div>
-
-                                    {/* 2. Action & Content */}
-                                    <div className="flex-1 min-w-0 flex items-center gap-3">
-                                        <div className="flex items-center gap-2">
-                                            {isGroup ? (
-                                                <Badge variant="secondary" className="gap-1.5 font-medium text-gray-600 bg-gray-100 hover:bg-gray-200">
-                                                    <Layers className="h-3 w-3" />
-                                                    {group.items.length} updates
-                                                </Badge>
-                                            ) : (
-                                                <span className="text-sm font-semibold text-gray-900">
-                                                    {mainLog.action.replace(/_/g, " ")}
-                                                </span>
-                                            )}
-
-                                            <span className="text-sm text-gray-400 hidden sm:inline">-</span>
-
-                                            <span className="text-sm text-gray-500 truncate">
-                                                {isGroup ? (
-                                                    <span>
-                                                        <span className="font-medium text-gray-700">{group.user.name}</span> made multiple changes to <span className="font-medium text-gray-900">{group.entityType}</span>
-                                                    </span>
-                                                ) : (
-                                                    <span>
-                                                        <span className="font-medium text-gray-900">{text || group.entityId}</span>
-                                                    </span>
-                                                )}
-                                            </span>
+                                    <div className="px-5 py-4 flex items-center gap-4">
+                                        {/* Avatar Mini */}
+                                        <div className="h-6 w-6 shrink-0 rounded-full bg-talabat-light-gray flex items-center justify-center text-[10px] font-bold text-talabat-text-dark">
+                                            {group.user.name.charAt(0)}
                                         </div>
 
-                                        {/* Impact Badge - Inline */}
-                                        {!isGroup && impact && (
-                                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-50 text-red-700 text-xs font-medium border border-red-100">
-                                                <AlertTriangle className="h-3 w-3" />
-                                                {impact.type === 'LATE' ? 'Late Submission' : 'Risk'}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* 3. Time & Chev */}
-                                    <div className="flex items-center gap-4 pl-4 border-l border-gray-50">
-                                        <span className="text-xs text-gray-400 whitespace-nowrap font-medium">
-                                            {format(new Date(group.startTime), "h:mm a")}
-                                        </span>
-                                        {isGroup ? (
-                                            isExpanded ? <ChevronUp className="h-4 w-4 text-gray-400" /> : <ChevronDown className="h-4 w-4 text-gray-400" />
-                                        ) : (
-                                            <ChevronRight className="h-4 w-4 text-gray-300" />
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Expanded Group View */}
-                                {isGroup && isExpanded && (
-                                    <div className="bg-gray-50 border-t border-gray-100 divide-y divide-gray-100">
-                                        {group.items.map((item: any) => {
-                                            const d = getParsedDetails(item.details);
-                                            return (
-                                                <div
-                                                    key={item.id}
-                                                    onClick={() => setSelectedLog(item)}
-                                                    className="px-4 py-2.5 pl-16 flex items-center gap-3 hover:bg-gray-100 cursor-pointer transition-colors"
-                                                >
-                                                    <div className="w-1.5 h-1.5 rounded-full bg-gray-300" />
-                                                    <span className="text-xs font-semibold uppercase text-gray-500 w-32 tracking-wide">
-                                                        {item.action.replace(/_/g, " ")}
-                                                    </span>
-                                                    <span className="text-sm text-gray-900 flex-1">
-                                                        {d.text}
-                                                    </span>
-                                                    <span className="text-xs text-gray-400 font-mono">
-                                                        {format(new Date(item.createdAt), "h:mm a")}
+                                        {/* Content */}
+                                        <div className="flex-1 min-w-0">
+                                            {isGroup ? (
+                                                <div className="flex items-center gap-2">
+                                                    <Badge variant="secondary" className="gap-1 bg-talabat-light-gray text-talabat-text-dark border-0 hover:bg-gray-200">
+                                                        <Layers className="h-3 w-3" />
+                                                        {group.items.length} grouped updates
+                                                    </Badge>
+                                                    <span className="text-talabat-text-muted truncate">
+                                                        <span className="font-bold text-talabat-text-dark">{group.user.name}</span> made multiple changes to <span className="font-bold text-talabat-text-dark">{group.entityType}</span>
                                                     </span>
                                                 </div>
-                                            )
-                                        })}
+                                            ) : (
+                                                <div className="truncate">
+                                                    {getHumanReadableLog(mainLog, text)}
+                                                </div>
+                                            )}
+                                        </div>
+
+                                        {/* Impact Badge */}
+                                        {!isGroup && impact && (
+                                            <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-red-50 text-red-700 text-xs font-bold border border-red-100 shrink-0">
+                                                <AlertTriangle className="h-3 w-3" />
+                                                {impact.type === 'LATE' ? 'Late' : 'Risk'}
+                                            </div>
+                                        )}
+
+                                        {/* Time */}
+                                        <div className="flex items-center gap-3 pl-4 border-l border-talabat-border shrink-0">
+                                            <span className="text-xs font-bold text-talabat-text-muted">
+                                                {format(new Date(group.startTime), "h:mm a")}
+                                            </span>
+                                            {isGroup ? (
+                                                isExpanded ? <ChevronUp className="h-4 w-4 text-talabat-text-muted" /> : <ChevronDown className="h-4 w-4 text-talabat-text-muted" />
+                                            ) : (
+                                                <ChevronRight className="h-4 w-4 text-talabat-border" />
+                                            )}
+                                        </div>
                                     </div>
-                                )}
+
+                                    {/* Expanded Group View */}
+                                    {isGroup && isExpanded && (
+                                        <div className="bg-talabat-cream/30 border-t border-talabat-border divide-y divide-talabat-border/50">
+                                            {group.items.map((item: any) => {
+                                                const d = getParsedDetails(item.details);
+                                                return (
+                                                    <div
+                                                        key={item.id}
+                                                        onClick={(e) => { e.stopPropagation(); setSelectedLog(item); }}
+                                                        className="px-5 py-3 pl-16 flex items-center gap-3 hover:bg-white cursor-pointer transition-colors text-sm"
+                                                    >
+                                                        <span className="text-[10px] font-bold uppercase text-talabat-orange w-24 tracking-wide shrink-0">
+                                                            {item.action.replace(/_/g, " ")}
+                                                        </span>
+                                                        <span className="text-talabat-text-dark flex-1 truncate">
+                                                            {d.text || item.entityId}
+                                                        </span>
+                                                        <span className="text-[10px] text-talabat-text-muted font-bold tracking-wider shrink-0">
+                                                            {format(new Date(item.createdAt), "h:mm a")}
+                                                        </span>
+                                                    </div>
+                                                )
+                                            })}
+                                        </div>
+                                    )}
+                                </div>
                             </div>
                         )
                     })
